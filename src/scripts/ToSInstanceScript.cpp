@@ -1,4 +1,5 @@
 #include "ToSInstanceScript.h"
+#include "Chat.h"
 
 #include <random>
 
@@ -176,9 +177,8 @@ void ToSInstanceScript::ApplyAutoScaling(Creature* creature)
     uint32 health = (baseHP * hpMultiplier) *
                     frand(1.01, 1.02); // Add a tiny bit of variation to the health
 
-    creature->SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, health);
-    creature->UpdateMaxHealth();
-    creature->SetHealth(creature->GetMaxHealth());
+    creature->SetMaxHealth(health);
+    creature->SetHealth(health);
 
     uint32 basePhys = sConfigMgr->GetOption<uint32>("TrialOfStrength.AutoScaling.BaseDamage.Physical", 500);
 
@@ -192,18 +192,19 @@ void ToSInstanceScript::ApplyAutoScaling(Creature* creature)
 
     uint32 newPhysDmg = basePhys * (1.0f + (float(currentWave) / float(physDivider)));
 
-    LOG_INFO("module", "Base mainhand: {}, Pct mainhand: {}, AttackPower: {}", creature->GetModifierValue(UNIT_MOD_DAMAGE_MAINHAND, BASE_VALUE), creature->GetModifierValue(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT), creature->GetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE));
+
 
     // Remove all attack power
-    creature->HandleStatModifier(UNIT_MOD_ATTACK_POWER, BASE_VALUE, creature->GetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE), false);
+    float minDamage = basePhys * newPhysDmg;
+    float maxDamage = minDamage * 1.2f;
 
-    creature->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, BASE_VALUE, creature->GetModifierValue(UNIT_MOD_DAMAGE_MAINHAND, BASE_VALUE), false);
-    creature->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, BASE_VALUE, newPhysDmg, true);
+    creature->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, minDamage);
+    creature->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, maxDamage);
 
-    creature->HandleStatModifier(UNIT_MOD_DAMAGE_OFFHAND, BASE_VALUE, creature->GetModifierValue(UNIT_MOD_DAMAGE_OFFHAND, BASE_VALUE), false);
-    creature->HandleStatModifier(UNIT_MOD_DAMAGE_OFFHAND, BASE_VALUE, newPhysDmg, true);
+    creature->UpdateAllStats();
+    creature->UpdateDamagePhysical(BASE_ATTACK);
 
-    LOG_INFO("module", "Base mainhand: {}, Pct mainhand: {}, AttackPower: {}", creature->GetModifierValue(UNIT_MOD_DAMAGE_MAINHAND, BASE_VALUE), creature->GetModifierValue(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT), creature->GetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE));
+
 }
 
 void ToSInstanceScript::ClearCursesFromPlayers()
@@ -607,7 +608,7 @@ bool ToSInstanceScript::CheckFailure()
 
 void ToSInstanceScript::NotifyFailure()
 {
-    std::string message = Acore::StringFormatFmt("|cffFF9900Trial of Strength Failed!|r", currentWave);
+    std::string message = Acore::StringFormat("|cffFF9900Trial of Strength Failed!|r", currentWave);
     Map::PlayerList const& players = instance->GetPlayers();
 
     for (const auto& it : players)
@@ -741,7 +742,7 @@ void ToSInstanceScript::NotifyPlayers()
         if (!player)
             continue;
 
-        std::string message = Acore::StringFormatFmt("|cffFFFFFFWave |cff00FF00{}|r |cffFFFFFFcleared!|r", currentWave);
+        std::string message = Acore::StringFormat("|cffFFFFFFWave |cff00FF00{}|r |cffFFFFFFcleared!|r", currentWave);
 
         player->SendSystemMessage(message);
         player->PlayDirectSound(17316 /* RDF Reward Sound */);
@@ -1044,7 +1045,7 @@ void ToSInstanceScript::AnnounceCompletion()
             continue;
         }
 
-        ss << Acore::StringFormatFmt("{}{}", sToSMapMgr->GetHexColorFromClass(player->getClass()), player->GetName());
+        ss << Acore::StringFormat("{}{}", sToSMapMgr->GetHexColorFromClass(player->getClass()), player->GetName());
 
         if (i != playerCount)
         {
@@ -1052,18 +1053,27 @@ void ToSInstanceScript::AnnounceCompletion()
         }
     }
 
-    ss << Acore::StringFormatFmt(" |cffFFFFFFfor defeating all waves ({}) in the |cffFF2651Trial of Strength", sToSMapMgr->GetTotalWaves());
+    ss << Acore::StringFormat(" |cffFFFFFFfor defeating all waves ({}) in the |cffFF2651Trial of Strength", sToSMapMgr->GetTotalWaves());
 
     if (hasCurses)
     {
-        ss << Acore::StringFormatFmt(" |cffFFFFFFwith |cffC436C1{}|cffFFFFFF curses!|r", curses.size());
+        ss << Acore::StringFormat(" |cffFFFFFFwith |cffC436C1{}|cffFFFFFF curses!|r", curses.size());
     }
     else
     {
         ss << "!|r";
     }
 
-    sWorld->SendServerMessage(SERVER_MSG_STRING, ss.str());
+    //sWorld->SendServerMessage(SERVER_MSG_STRING, ss.str());
+
+    for (const auto& it : players)
+    {
+    Player* player = it.GetSource();
+    if (!player)
+        continue;
+
+    ChatHandler(player->GetSession()).PSendSysMessage(ss.str());
+    }
 }
 
 void ToSInstanceScript::SendInvadersWorldState(bool state, uint32 invaders)

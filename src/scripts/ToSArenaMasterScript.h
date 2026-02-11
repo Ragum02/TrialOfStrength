@@ -1,3 +1,4 @@
+#include <fmt/core.h>
 #ifndef MODULE_TRIAL_OF_STRENGTH_ARENA_MASTER_H
 #define MODULE_TRIAL_OF_STRENGTH_ARENA_MASTER_H
 
@@ -75,7 +76,7 @@ public:
 
         if (iScript->IsEncounterInProgress() && !waveCleared)
         {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, Acore::StringFormatFmt("Encounter In Progress: {}|nCurrent Wave: |cff0000FF{}|r|nCurrent Sub-Wave: {}/{}|nWave Cleared: {}|nAlive: |cffFF0000{}|r|nMore Waves?: {}", iScript->IsEncounterInProgress() ? "true" : "false", currentWave, currentSubWave, totalSubWave, waveCleared ? "true" : "false", remainingAlive, hasMoreWaves ? "true" : "false"), GOSSIP_SENDER_MAIN, 0);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, Acore::StringFormat("Encounter In Progress: {}|nCurrent Wave: |cff0000FF{}|r|nCurrent Sub-Wave: {}/{}|nWave Cleared: {}|nAlive: |cffFF0000{}|r|nMore Waves?: {}", iScript->IsEncounterInProgress() ? "true" : "false", currentWave, currentSubWave, totalSubWave, waveCleared ? "true" : "false", remainingAlive, hasMoreWaves ? "true" : "false"), GOSSIP_SENDER_MAIN, 0);
 
             SendGossipMenuFor(player, TOS_ARENA_MASTER_TEXT_WAVE_NOT_FINISHED, creature);
 
@@ -86,12 +87,12 @@ public:
         {
             if (iScript->IsRewardChestEmpty())
             {
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, Acore::StringFormatFmt("Yes, I would like to proceed to the next wave. ({})", currentWave + 1), GOSSIP_SENDER_MAIN, TOS_GOSSIP_ENCOUNTER_NEXT_WAVE);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, Acore::StringFormat("Yes, I would like to proceed to the next wave. ({})", currentWave + 1), GOSSIP_SENDER_MAIN, TOS_GOSSIP_ENCOUNTER_NEXT_WAVE);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I would like to stop here.", GOSSIP_SENDER_MAIN, TOS_GOSSIP_ENCOUNTER_RESET);
             }
             else
             {
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, Acore::StringFormatFmt("Yes, I would like to proceed to the next wave. ({})", currentWave + 1), GOSSIP_SENDER_MAIN, TOS_GOSSIP_ENCOUNTER_NEXT_WAVE, "You have unlooted items in the reward chest, are you sure you want to continue?", 0, false);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, Acore::StringFormat("Yes, I would like to proceed to the next wave. ({})", currentWave + 1), GOSSIP_SENDER_MAIN, TOS_GOSSIP_ENCOUNTER_NEXT_WAVE, "You have unlooted items in the reward chest, are you sure you want to continue?", 0, false);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I would like to stop here.", GOSSIP_SENDER_MAIN, TOS_GOSSIP_ENCOUNTER_RESET, "You have unlooted items in the reward chest, are you sure you want to continue?", 0, false);
             }
 
