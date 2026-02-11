@@ -1,4 +1,5 @@
-![banner](https://cdn.discordapp.com/attachments/740999436876120127/1168057693907460136/banner2.png?ex=6550617f&is=653dec7f&hm=94411fcc08408464d7c1276c97f7246c965550efa86291ccef073e796d8691f6&)
+# ToS from AnchyDev updated by Ragum02
+
 Trial of Strength (ToS) is an AzerothCore module that adds a test of strength arena to test players skills in combat.
 
 ## Features
@@ -14,8 +15,9 @@ Trial of Strength (ToS) is an AzerothCore module that adds a test of strength ar
 4. Setup the `tos_wave_groups` table with your created creatures.
 5. Setup the `tos_reward_template` with your rewards for each wave.
 6. Create wave entries in `tos_wave_template` which links to your `tos_wave_groups` and `tos_reward_template` entries.
-7. Enable the module.
-8. Spawn the arena entry (entry: 441250) NPC anywhere you want.
+7. Enable the module (build\bin\RelWithDebInfo\configs\module\trialofstrength.conf => TrialOfStrength.Enable = 1)
+9. Spawn the arena entry (entry: 441250) NPC anywhere you want in the game.
+10. Give yourself ticket item (entry : 25747), speak to the NPC => jump in the pink portal and enjoy.
 
 ## Note
 This module is a work in progress, so expect bugs and crashes as the module is not heavily tested.
