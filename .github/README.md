@@ -21,6 +21,3 @@ Trial of Strength (ToS) is an AzerothCore module that adds a test of strength ar
 
 ## Note
 This module is a work in progress, so expect bugs and crashes as the module is not heavily tested.
-
-## Contact
-If you have any issues setting up the module, you can [contact me on my community Discord](https://discord.gg/xdVPGcpJ8C).
